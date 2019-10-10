@@ -24,17 +24,24 @@ unpred_combo = [...
     5 6 7 8;...
     4 1 2 3];
 
+flip_combos = [...
+    5 6 7 8;...
+    3 4 1 2];
+
 Fs = 60;
 dist_th = 70;
 f_all = .5:.5:(Fs/2);
 pt_th = .325;
+max_signal_len = 500;
 
 % compute features:
 %   - error at 70 pixels from center
 %   - psd of second half
 %   - psd of first half
 h_means_1 = cell(2, 3); %rows: L- vs. H-PT, cols: pred, unpred, or no-cue
-h_metric_trials = nan(length(data_set)*48, 6); %columns: metric, pred vs unpred, Low vs high pt, cue vs. no cue, trial, block
+h_metric_trials = nan(length(data_set)*48, 6); %columns: metric, pred vs unpred, Low vs high pt, cue vs. no cue, trial, block, trial-needing-trajectory-flipped
+kin_metric_trials = nan(length(data_set)*48, max_signal_len, 5); %trials match with factors in h_metric_trials 
+            % (trials, signal-length, [time, y, vy, ay, |a|)
 for i_pt = 1:2
     for i_cue = 1:3
         h_means_1{i_pt, i_cue} = nan(length(f_all), length(data_set));
@@ -66,6 +73,7 @@ for i_block = 1:length(data_set)
         pred_tr = zeros(1, length(b_data.k_split));
         unpred_tr = zeros(1, length(b_data.k_split));
         nocue_tr = zeros(1, length(b_data.k_split));
+        flip_tr = zeros(1, length(b_data.k_split));
     
         % label each trial as being of type P (predictive), NP
         % (unpredictive) or NC (no cue):
@@ -78,11 +86,18 @@ for i_block = 1:length(data_set)
             for i_unpred = 1:size(unpred_combo,2)
                 unpred_check(i_unpred) = isequal(unpred_combo(:, i_unpred), combo(:, i_tr));
             end
+            flip_check = nan(1, size(flip_combos,2));
+            for i_flip = 1:size(flip_combos, 2)
+                flip_check(i_flip) = isequal(flip_combos(:, i_flip), combo(:, i_tr));
+            end
             if sum(pred_check) > 0
                 pred_tr(i_tr) = 1;
             end
             if sum(unpred_check) > 0
                 unpred_tr(i_tr) = 1;
+            end
+            if sum(flip_check) > 0
+                flip_tr(i_tr) = 1;
             end
             nocue_tr(i_tr) = ~pred_tr(i_tr) & ~unpred_tr(i_tr);
         end
@@ -96,6 +111,7 @@ for i_block = 1:length(data_set)
         pred_tr = logical(pred_tr);
         unpred_tr = logical(unpred_tr);
         nocue_tr = logical(nocue_tr);
+        flip_tr = logical(flip_tr);
 
         tr_inds = 1:length(b_data.k_split);
 
@@ -230,7 +246,10 @@ for i_block = 1:length(data_set)
             try
                 temp_h = interp1(f1_all(~isnan(f1_all(:,i_tr)), i_tr), ...
                     h1_all(~isnan(f1_all(:,i_tr)), i_tr), f_all);
-                
+            catch er__
+                warning('interpolation error')
+            end
+            try
                 h_metric_trials(total_trial_k, 1) = nanmean(temp_h(temp_f));
                 h_metric_trials(total_trial_k, 2) = pred_tr(i_tr);
                 h_metric_trials(total_trial_k, 3) = hpt_tr(i_tr);
@@ -238,12 +257,34 @@ for i_block = 1:length(data_set)
                 h_metric_trials(total_trial_k, 5) = total_trial_k;
                 h_metric_trials(total_trial_k, 6) = i_block;
                 
+                t_offset_temp = b_data.t(b_data.k_split(i_tr), i_tr);
+                t_shifted_temp = b_data.t(:, i_tr) - t_offset_temp;
+                kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 1) = t_shifted_temp;
+                if flip_tr(i_tr)
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 2) =...
+                        -b_data.y(:, i_tr);
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 3) =...
+                        -b_data.vy(:, i_tr);
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 4) =...
+                        -b_data.ay(:, i_tr);
+                else
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 2) =...
+                        b_data.y(:, i_tr);
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 3) =...
+                        b_data.vy(:, i_tr);
+                    kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 4) =...
+                        b_data.ay(:, i_tr);
+                end
+                kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 5) = b_data.ma(:, i_tr);
+                
                 total_trial_k = total_trial_k + 1;
                 temp_h = nan(size(f_all));
+                t_shifted_temp = nan;
             catch er__
-                warning('interpolation error')
+                warning('data assignment error')
                 total_trial_k = total_trial_k + 1;
                 temp_h = nan(size(f_all));
+                t_shifted_temp = nan;
             end
         end
 
@@ -308,6 +349,7 @@ s_data.h_means_1 = h_means_1;
 s_data.h_means_2 = h_means_2;
 s_data.v_err = v_err;
 s_data.h_all = h_metric_trials;
+s_data.kin_all = kin_metric_trials;
 
 function [f,h] = compute_psd(sd, F, valid_trs, which_half)
 % compute the first half of signal psd

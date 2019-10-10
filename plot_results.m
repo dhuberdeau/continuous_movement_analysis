@@ -130,7 +130,63 @@ else
     axis([1 6 -99 -90])
 end
 
-%% Get trial-level metric measures:
+%% Plot kinematic measures:
+
+temp = H_results.kin_all;
+hpt = H_results.metric_all(:, 3);
+pred = H_results.metric_all(:, 2);
+nocue = H_results.metric_all(:, 4);
+
+hpt(isnan(hpt)) = 0;
+pred(isnan(pred)) = 0;
+nocue(isnan(nocue)) = 0;
+hpt = boolean(hpt);
+pred = boolean(pred);
+nocue = boolean(nocue);
+
+figure;
+subplot(411); hold on
+t_HPN = temp(hpt & pred & ~nocue, :, 1);
+y_HPN = temp(hpt & pred & ~nocue, :, 2);
+plot(t_HPN', y_HPN');
+xlim([-1.5 1.5])
+
+subplot(412); hold on
+vy_HPN = temp(hpt & pred & ~nocue, :, 3);
+plot(t_HPN', vy_HPN');
+xlim([-1.5 1.5])
+
+subplot(413); hold on
+ay_HPN = temp(hpt & pred & ~nocue, :, 4);
+plot(t_HPN', ay_HPN');
+xlim([-1.5 1.5])
+
+subplot(414); hold on
+am_HPN = temp(hpt & pred & ~nocue, :, 5);
+plot(t_HPN', am_HPN');
+xlim([-1.5 1.5])
+
+figure;
+subplot(411); hold on
+t_HPN = temp(~hpt & ~pred & ~nocue, :, 1);
+y_HPN = temp(~hpt & ~pred & ~nocue, :, 2);
+plot(t_HPN', y_HPN');
+xlim([-1.5 1.5])
+
+subplot(412); hold on
+vy_HPN = temp(~hpt & ~pred & ~nocue, :, 3);
+plot(t_HPN', vy_HPN');
+xlim([-1.5 1.5])
+
+subplot(413); hold on
+ay_HPN = temp(~hpt & ~pred & ~nocue, :, 4);
+plot(t_HPN', ay_HPN');
+xlim([-1.5 1.5])
+
+subplot(414); hold on
+am_HPN = temp(~hpt & ~pred & ~nocue, :, 5);
+plot(t_HPN', am_HPN');
+xlim([-1.5 1.5])
 
 
 %%
