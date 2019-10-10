@@ -148,45 +148,53 @@ figure;
 subplot(411); hold on
 t_HPN = temp(hpt & pred & ~nocue, :, 1);
 y_HPN = temp(hpt & pred & ~nocue, :, 2);
-plot(t_HPN', y_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', y_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(412); hold on
 vy_HPN = temp(hpt & pred & ~nocue, :, 3);
-plot(t_HPN', vy_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', vy_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(413); hold on
 ay_HPN = temp(hpt & pred & ~nocue, :, 4);
-plot(t_HPN', ay_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', ay_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(414); hold on
 am_HPN = temp(hpt & pred & ~nocue, :, 5);
-plot(t_HPN', am_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', am_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 figure;
 subplot(411); hold on
 t_HPN = temp(~hpt & ~pred & ~nocue, :, 1);
 y_HPN = temp(~hpt & ~pred & ~nocue, :, 2);
-plot(t_HPN', y_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', y_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(412); hold on
 vy_HPN = temp(~hpt & ~pred & ~nocue, :, 3);
-plot(t_HPN', vy_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', vy_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(413); hold on
 ay_HPN = temp(~hpt & ~pred & ~nocue, :, 4);
-plot(t_HPN', ay_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', ay_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 subplot(414); hold on
 am_HPN = temp(~hpt & ~pred & ~nocue, :, 5);
-plot(t_HPN', am_HPN');
-xlim([-1.5 1.5])
+[t_, a_] = timeaverage(t_HPN', am_HPN');
+plot(t_, a_);
+xlim([-.5 .5])
 
 
 %%

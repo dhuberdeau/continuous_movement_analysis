@@ -14,15 +14,15 @@ function [b_data, varargout] = process_block(Data)
 %   - Find the directional error of the second sub-movement relative the
 %   the target position.
 %   - Compute the PSD of the acceleration amplitude
-
-t_all = nan(300, length(Data.pPT));
-x_all = nan(300, length(Data.pPT));
-y_all = nan(300, length(Data.pPT));
-vx_all = nan(300, length(Data.pPT));
-vy_all = nan(300, length(Data.pPT));
-ax_all = nan(300, length(Data.pPT));
-ay_all = nan(300, length(Data.pPT));
-ma_all = nan(300, length(Data.pPT));
+max_signal_len = 500;
+t_all = nan(max_signal_len, length(Data.pPT));
+x_all = nan(max_signal_len, length(Data.pPT));
+y_all = nan(max_signal_len, length(Data.pPT));
+vx_all = nan(max_signal_len, length(Data.pPT));
+vy_all = nan(max_signal_len, length(Data.pPT));
+ax_all = nan(max_signal_len, length(Data.pPT));
+ay_all = nan(max_signal_len, length(Data.pPT));
+ma_all = nan(max_signal_len, length(Data.pPT));
 k_split = nan(1, length(Data.pPT));
 k_targ = nan(1, length(Data.pPT));
 
