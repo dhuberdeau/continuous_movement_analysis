@@ -1,4 +1,4 @@
-function stats_results = plot_results(H_results)
+function stats_results = plot_results(H_results, varargin)
 % function plot_results(H_results)
 %
 % Plots results generated from process_group* function
@@ -144,57 +144,119 @@ hpt = boolean(hpt);
 pred = boolean(pred);
 nocue = boolean(nocue);
 
-figure;
-subplot(411); hold on
 t_HPN = temp(hpt & pred & ~nocue, :, 1);
 y_HPN = temp(hpt & pred & ~nocue, :, 2);
-[t_, a_] = timeaverage(t_HPN', y_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
-
-subplot(412); hold on
 vy_HPN = temp(hpt & pred & ~nocue, :, 3);
-[t_, a_] = timeaverage(t_HPN', vy_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
-
-subplot(413); hold on
 ay_HPN = temp(hpt & pred & ~nocue, :, 4);
-[t_, a_] = timeaverage(t_HPN', ay_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
-
-subplot(414); hold on
 am_HPN = temp(hpt & pred & ~nocue, :, 5);
-[t_, a_] = timeaverage(t_HPN', am_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
+
+t_LUN = temp(~hpt & ~pred & ~nocue, :, 1);
+y_LUN = temp(~hpt & ~pred & ~nocue, :, 2);
+vy_LUN = temp(~hpt & ~pred & ~nocue, :, 3);
+ay_LUN = temp(~hpt & ~pred & ~nocue, :, 4);
+am_LUN = temp(~hpt & ~pred & ~nocue, :, 5);
+
+t_N = [t_HPN; t_LUN];
+y_N = [y_HPN; y_LUN];
+vy_N = [vy_HPN; vy_LUN];
+ay_N = [ay_HPN; ay_LUN];
+am_N = [am_HPN; am_LUN];
+cat = [zeros(size(t_HPN,1),1); ones(size(t_LUN,1),1)];
+[t_main, kin_up, kin_down, kin_int] = fit_transform_movement_direction(t_N, y_N, vy_N, ay_N, am_N, cat);
+
+meas_limits = {[-250 250], [-.2, .2], [-0.00031, 0.00031], [-0.00031 0.00031]};
+figure;
+for i_meas = 1:4
+    subplot(1,4,i_meas)
+    plot(t_main, nanmean(kin_up{i_meas}));
+    ylim(meas_limits{i_meas});
+end
+f = gcf; 
+set(f, 'Position', [1 683 1679 272]);
+if nargin > 1
+    saveas(f, ['targ1_', varargin{1}, '.png'])
+end
 
 figure;
-subplot(411); hold on
-t_HPN = temp(~hpt & ~pred & ~nocue, :, 1);
-y_HPN = temp(~hpt & ~pred & ~nocue, :, 2);
-[t_, a_] = timeaverage(t_HPN', y_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
+for i_meas = 1:4
+    subplot(1,4,i_meas)
+    plot(t_main, nanmean(kin_down{i_meas}));
+    ylim(meas_limits{i_meas});
+end
+f = gcf; 
+set(f, 'Position', [1 683 1679 272]);
+if nargin > 1
+    saveas(f, ['targ2_', varargin{1}, '.png'])
+end
 
-subplot(412); hold on
-vy_HPN = temp(~hpt & ~pred & ~nocue, :, 3);
-[t_, a_] = timeaverage(t_HPN', vy_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
+figure;
+for i_meas = 1:4
+    subplot(1,4,i_meas)
+    plot(t_main, nanmean(kin_int{i_meas}));
+    ylim(meas_limits{i_meas});
+end
+f = gcf; 
+set(f, 'Position', [1 683 1679 272]);
+if nargin > 1
+    saveas(f, ['targ_intermediate_', varargin{1}, '.png'])
+end
 
-subplot(413); hold on
-ay_HPN = temp(~hpt & ~pred & ~nocue, :, 4);
-[t_, a_] = timeaverage(t_HPN', ay_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
+% plot and save all on same axes:
+figure;
+for i_meas = 1:4
+    subplot(1,4,i_meas); hold on;
+    plot(t_main, nanmean(kin_up{i_meas}), 'k');
+    plot(t_main, nanmean(kin_down{i_meas}), 'r');
+    plot(t_main, nanmean(kin_int{i_meas}), 'Color', [.5 .5 .5]);
+    ylim(meas_limits{i_meas});
+end
+f = gcf; 
+set(f, 'Position', [1 683 1679 272]);
+if nargin > 1
+    saveas(f, ['targ_all_', varargin{1}, '.png'])
+end
 
-subplot(414); hold on
-am_HPN = temp(~hpt & ~pred & ~nocue, :, 5);
-[t_, a_] = timeaverage(t_HPN', am_HPN');
-plot(t_, a_);
-xlim([-.5 .5])
+% figure;
+% subplot(411); hold on
+% [t_, a_] = timeaverage(t_HPN', y_HPN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(412); hold on
+% [t_, a_] = timeaverage(t_HPN', vy_HPN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(413); hold on
+% [t_, a_] = timeaverage(t_HPN', ay_HPN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(414); hold on
+% [t_, a_] = timeaverage(t_HPN', am_HPN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% figure;
+% subplot(411); hold on
+% [t_, a_] = timeaverage(t_LUN', y_LUN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(412); hold on
+% [t_, a_] = timeaverage(t_LUN', vy_LUN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(413); hold on
+% [t_, a_] = timeaverage(t_LUN', ay_LUN');
+% plot(t_, a_);
+% xlim([-.5 .5])
+% 
+% subplot(414); hold on
+% [t_, a_] = timeaverage(t_LUN', am_LUN');
+% plot(t_, a_);
+% xlim([-.5 .5])
 
 
 %%
