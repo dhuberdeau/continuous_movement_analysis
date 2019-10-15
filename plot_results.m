@@ -13,7 +13,7 @@ H_h_p_2 = H_results.high_pt.p;
 H_l_p_2 = H_results.low_pt.p;
 f = H_results.freq;
 
-figure; 
+figure;
 subplot(2,1,1);
 hold on
 plot(f, nanmean(H_h_nc_2(:,:,end), 2), 'k-', 'Linewidth',2)
@@ -28,7 +28,7 @@ title('No-cue');
 legend('Diff: High - Low');
 axis([0 10 -10 4])
 
-figure; 
+figure;
 subplot(2,2,1); hold on
 plot(f, nanmean(H_l_nc_2(:,:,end), 2), 'b-', 'Linewidth',2)
 plot(f, nanmean(H_h_p_2(:,:,1), 2), 'k.-', 'Linewidth',1)
@@ -80,7 +80,7 @@ axis([0 10 -10 4])
 if size(H_results.low_pt.nc, 3) > 1
     % first and last block had NC
     figure; hold on
-    
+
     plot([1, 6], reshape(nanmean(nanmean(...
         H_results.low_pt.nc(k_f_start:k_f_end, :,:),1), 2),...
         1,size(H_results.low_pt.nc,3)), 'rs', 'MarkerSize', 14)
@@ -162,16 +162,29 @@ vy_N = [vy_HPN; vy_LUN];
 ay_N = [ay_HPN; ay_LUN];
 am_N = [am_HPN; am_LUN];
 cat = [zeros(size(t_HPN,1),1); ones(size(t_LUN,1),1)];
-[t_main, kin_up, kin_down, kin_int] = fit_transform_movement_direction(t_N, y_N, vy_N, ay_N, am_N, cat);
+[t_main, kin_0, kin_up, kin_down, kin_int] = fit_transform_movement_direction(t_N, y_N, vy_N, ay_N, am_N, cat);
 
 meas_limits = {[-250 250], [-.2, .2], [-0.00031, 0.00031], [-0.00031 0.00031]};
+
+figure;
+for i_meas = 1:4
+    subplot(1,4,i_meas)
+    plot(t_main, nanmean(kin_0{i_meas}));
+    ylim(meas_limits{i_meas});
+end
+f = gcf;
+set(f, 'Position', [1 683 1679 272]);
+if nargin > 1
+    saveas(f, ['targ1_', varargin{1}, '.png'])
+end
+
 figure;
 for i_meas = 1:4
     subplot(1,4,i_meas)
     plot(t_main, nanmean(kin_up{i_meas}));
     ylim(meas_limits{i_meas});
 end
-f = gcf; 
+f = gcf;
 set(f, 'Position', [1 683 1679 272]);
 if nargin > 1
     saveas(f, ['targ1_', varargin{1}, '.png'])
@@ -183,7 +196,7 @@ for i_meas = 1:4
     plot(t_main, nanmean(kin_down{i_meas}));
     ylim(meas_limits{i_meas});
 end
-f = gcf; 
+f = gcf;
 set(f, 'Position', [1 683 1679 272]);
 if nargin > 1
     saveas(f, ['targ2_', varargin{1}, '.png'])
@@ -195,7 +208,7 @@ for i_meas = 1:4
     plot(t_main, nanmean(kin_int{i_meas}));
     ylim(meas_limits{i_meas});
 end
-f = gcf; 
+f = gcf;
 set(f, 'Position', [1 683 1679 272]);
 if nargin > 1
     saveas(f, ['targ_intermediate_', varargin{1}, '.png'])
@@ -205,12 +218,13 @@ end
 figure;
 for i_meas = 1:4
     subplot(1,4,i_meas); hold on;
-    plot(t_main, nanmean(kin_up{i_meas}), 'k');
+    plot(t_main, nanmean(kin_0{i_meas}), 'k');
+    plot(t_main, nanmean(kin_up{i_meas}), 'g');
     plot(t_main, nanmean(kin_down{i_meas}), 'r');
     plot(t_main, nanmean(kin_int{i_meas}), 'Color', [.5 .5 .5]);
     ylim(meas_limits{i_meas});
 end
-f = gcf; 
+f = gcf;
 set(f, 'Position', [1 683 1679 272]);
 if nargin > 1
     saveas(f, ['targ_all_', varargin{1}, '.png'])
@@ -221,38 +235,38 @@ end
 % [t_, a_] = timeaverage(t_HPN', y_HPN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(412); hold on
 % [t_, a_] = timeaverage(t_HPN', vy_HPN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(413); hold on
 % [t_, a_] = timeaverage(t_HPN', ay_HPN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(414); hold on
 % [t_, a_] = timeaverage(t_HPN', am_HPN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % figure;
 % subplot(411); hold on
 % [t_, a_] = timeaverage(t_LUN', y_LUN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(412); hold on
 % [t_, a_] = timeaverage(t_LUN', vy_LUN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(413); hold on
 % [t_, a_] = timeaverage(t_LUN', ay_LUN');
 % plot(t_, a_);
 % xlim([-.5 .5])
-% 
+%
 % subplot(414); hold on
 % [t_, a_] = timeaverage(t_LUN', am_LUN');
 % plot(t_, a_);
@@ -261,34 +275,34 @@ end
 
 %%
 % compute difference in power in desired freq. range for each trial type
-% and for the first and the last blocks. Difference is taken relative to 
-% Long-PT predictive trials in the last block (theoretically the most 
+% and for the first and the last blocks. Difference is taken relative to
+% Long-PT predictive trials in the last block (theoretically the most
 % proficient trial type). (note: for experiment conditions where there was
-% no trial type in the last block, the first block will basically get 
+% no trial type in the last block, the first block will basically get
 % copied to the last block):
 % % S_l_nc_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_nc_2(k_f_start:k_f_end, :, 1), 1);
 % % S_l_np_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_np_2(k_f_start:k_f_end, :, 1), 1);
 % % S_l_p_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_p_2(k_f_start:k_f_end, :, 1), 1);
-% % 
+% %
 % % S_l_nc_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_nc_2(k_f_start:k_f_end, :, end), 1);
 % % S_l_np_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_np_2(k_f_start:k_f_end, :, end), 1);
 % % S_l_p_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_l_p_2(k_f_start:k_f_end, :, end), 1);
-% % 
+% %
 % % S_h_nc_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_h_nc_2(k_f_start:k_f_end, :, 1), 1);
 % % S_h_np_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_h_np_2(k_f_start:k_f_end, :, 1), 1);
 % % % S_h_p_1 = nanmean(H_h_p_2(k_f_start:k_f_end, :, 1), 1);
-% % 
+% %
 % % S_h_nc_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_h_nc_2(k_f_start:k_f_end, :, end), 1);
 % % S_h_np_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end),1) - nanmean(H_h_np_2(k_f_start:k_f_end, :, end), 1);
 % % % S_h_p_2 = nanmean(H_h_p_2(k_f_start:k_f_end, :, end), 1);
-% % 
+% %
 % % stats_results.high_pt.nc = [S_h_nc_1; S_h_nc_2]';
 % % stats_results.high_pt.np = [S_h_np_1; S_h_np_2]';
 % % % stats_results.high_pt.p = [S_h_p_1; S_h_p_2]';
 % % stats_results.low_pt.nc = [S_l_nc_1; S_l_nc_2]';
 % % stats_results.low_pt.np = [S_l_np_1; S_l_np_2]';
 % % stats_results.low_pt.p = [S_l_p_1; S_l_p_2]';
-% % 
+% %
 % % % compute average difference for each trial type for first and last blocks:
 % % m_mat = -[nanmean(stats_results.high_pt.nc);...
 % %     nanmean(stats_results.high_pt.np);...
@@ -300,9 +314,9 @@ end
 % %     sqrt(nanvar(stats_results.low_pt.nc)./20);...
 % %     sqrt(nanvar(stats_results.low_pt.np)./20);...
 % %     sqrt(nanvar(stats_results.low_pt.p)./20)];
-% % 
+% %
 % % % plot bars of the average difference for the last block:
-% % figure; 
+% % figure;
 % % bar(m_mat(:,2), 'k'); hold on;
 % % errorbar(1:length(m_mat), m_mat(:,2), s_mat(:,2), 'k.');
 % % axis([0 7 -4 10])
@@ -313,22 +327,21 @@ end
 % % % in missing values based on a more proper missing value analysis)
 % % temp_h_np_2 = S_h_np_2;
 % % temp_h_np_2(isnan(temp_h_np_2)) = nanmean(temp_h_np_2);
-% % 
+% %
 % % % b = S_h_p_2;
 % % % b(isnan(b)) = nanmean(b);
-% % 
+% %
 % % temp_l_np_2 = S_l_np_2;
 % % temp_l_np_2(isnan(temp_l_np_2)) = nanmean(temp_l_np_2);
-% % 
+% %
 % % temp_l_p_2 = S_l_p_2;
 % % temp_l_p_2(isnan(temp_l_p_2)) = nanmean(temp_l_p_2);
-% % 
+% %
 % % [h_aov1, d_aov1, p_aov1] = anova1([temp_h_np_2', temp_l_np_2', temp_l_p_2']);
-% % 
+% %
 % % [h_t, d_t, c_t, p_t] = ttest(temp_l_np_2 - temp_l_p_2);
-% % 
+% %
 % % stats_results.stats.aov = {h_aov1, d_aov1, p_aov1};
 % % stats_results.stats.t = {h_t, d_t, c_t, p_t};
 
 stats_results = [];
-
