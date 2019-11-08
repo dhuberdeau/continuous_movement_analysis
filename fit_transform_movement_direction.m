@@ -1,4 +1,4 @@
-function [t_main, kin_0, kin_up, kin_down, kin_int] = fit_transform_movement_direction(t, y, v, a, ma, cat)
+function [t_main, kin_0, kin_up, kin_down, kin_int] = fit_transform_movement_direction(t, y, v, a, ma, cat, varargin)
 
 % function f = fit_transform_movement_direction(m)
 %
@@ -13,6 +13,12 @@ N_COMPONENTS = 4;
 N_CLUSTERS = 3;
 
 Fs = 1/60;
+
+if nargin > 6
+    PLOT_OUT = varargin{1};
+else
+    PLOT_OUT = 0;
+end
 
 t_main = -.5:Fs:.5;
 
@@ -128,8 +134,14 @@ ma_int = m_interp(idk == int_id, :);
 kin_int = {y_int, v_int, a_int, ma_int};
 
 %% optional plot the trajectories of different groups:
-figure; hold on
-plot(t_main, y_interp(cat == 0, :)', 'k-');
-plot(t_main, y_interp(idk == cat0_id & ~(cat == 0), :)', 'g-');
-plot(t_main, y_interp(idk == int_id, :)', 'Color', [.5 .5 .5]);
-plot(t_main, y_interp(idk == down_id, :)', 'r-');
+if PLOT_OUT
+    figure; hold on
+    try
+        plot(t_main, y_interp(cat == 0, :)', 'k-');
+        plot(t_main, y_interp(idk == cat0_id & ~(cat == 0), :)', 'g-');
+        plot(t_main, y_interp(idk == int_id, :)', 'Color', [.5 .5 .5]);
+        plot(t_main, y_interp(idk == down_id, :)', 'r-');
+    catch
+        warning('plot failed');
+    end
+end

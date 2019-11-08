@@ -166,53 +166,53 @@ cat = [zeros(size(t_HPN,1),1); ones(size(t_LUN,1),1)];
 
 meas_limits = {[-250 250], [-.2, .2], [-0.00031, 0.00031], [-0.00031 0.00031]};
 
-figure;
-for i_meas = 1:4
-    subplot(1,4,i_meas)
-    plot(t_main, nanmean(kin_0{i_meas}));
-    ylim(meas_limits{i_meas});
-end
-f = gcf;
-set(f, 'Position', [1 683 1679 272]);
-if nargin > 1
-    saveas(f, ['targ1_', varargin{1}, '.png'])
-end
-
-figure;
-for i_meas = 1:4
-    subplot(1,4,i_meas)
-    plot(t_main, nanmean(kin_up{i_meas}));
-    ylim(meas_limits{i_meas});
-end
-f = gcf;
-set(f, 'Position', [1 683 1679 272]);
-if nargin > 1
-    saveas(f, ['targ1_', varargin{1}, '.png'])
-end
-
-figure;
-for i_meas = 1:4
-    subplot(1,4,i_meas)
-    plot(t_main, nanmean(kin_down{i_meas}));
-    ylim(meas_limits{i_meas});
-end
-f = gcf;
-set(f, 'Position', [1 683 1679 272]);
-if nargin > 1
-    saveas(f, ['targ2_', varargin{1}, '.png'])
-end
-
-figure;
-for i_meas = 1:4
-    subplot(1,4,i_meas)
-    plot(t_main, nanmean(kin_int{i_meas}));
-    ylim(meas_limits{i_meas});
-end
-f = gcf;
-set(f, 'Position', [1 683 1679 272]);
-if nargin > 1
-    saveas(f, ['targ_intermediate_', varargin{1}, '.png'])
-end
+% figure;
+% for i_meas = 1:4
+%     subplot(1,4,i_meas)
+%     plot(t_main, nanmean(kin_0{i_meas}));
+%     ylim(meas_limits{i_meas});
+% end
+% f = gcf;
+% set(f, 'Position', [1 683 1679 272]);
+% if nargin > 1
+%     saveas(f, ['targ1_', varargin{1}, '.png'])
+% end
+% 
+% figure;
+% for i_meas = 1:4
+%     subplot(1,4,i_meas)
+%     plot(t_main, nanmean(kin_up{i_meas}));
+%     ylim(meas_limits{i_meas});
+% end
+% f = gcf;
+% set(f, 'Position', [1 683 1679 272]);
+% if nargin > 1
+%     saveas(f, ['targ1_', varargin{1}, '.png'])
+% end
+% 
+% figure;
+% for i_meas = 1:4
+%     subplot(1,4,i_meas)
+%     plot(t_main, nanmean(kin_down{i_meas}));
+%     ylim(meas_limits{i_meas});
+% end
+% f = gcf;
+% set(f, 'Position', [1 683 1679 272]);
+% if nargin > 1
+%     saveas(f, ['targ2_', varargin{1}, '.png'])
+% end
+% 
+% figure;
+% for i_meas = 1:4
+%     subplot(1,4,i_meas)
+%     plot(t_main, nanmean(kin_int{i_meas}));
+%     ylim(meas_limits{i_meas});
+% end
+% f = gcf;
+% set(f, 'Position', [1 683 1679 272]);
+% if nargin > 1
+%     saveas(f, ['targ_intermediate_', varargin{1}, '.png'])
+% end
 
 % plot and save all on same axes:
 figure;
