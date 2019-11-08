@@ -23,9 +23,9 @@ plot_bars <- function(dat_set){
   }
 } 
 
-plot_timecourse <- function(dat_set){
-  dat_cue <- subset(dat_set, nocue == 0)
-  dat_nocue <- subset(dat_set, nocue == 1)
+plot_timecourse <- function(dat_cue, dat_nocue){
+  # dat_cue <- subset(dat_set, nocue == 0)
+  # dat_nocue <- subset(dat_set, nocue == 1)
   for (i_block in c(1,2,3,4,5)){
     block_cue_L_P <- subset(dat_cue, block == (i_block+1) & hpt == 0 & predictive == 1)
     block_cue_L_N <- subset(dat_cue, block == (i_block+1) & hpt == 0 & predictive == 0)
@@ -131,6 +131,8 @@ summary(gm_hpt)
 summary(gm_all_hpt)
 
 plot_bars(dat)
+plot_timecourse(dat, dat0)
+# plot_timecourse(dat0)
 
 # calculate power of GLM test:
 m1 <- lm(metric ~ block, data = dat)

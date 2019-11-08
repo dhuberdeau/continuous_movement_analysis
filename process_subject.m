@@ -30,6 +30,7 @@ flip_combos = [...
 
 Fs = 60;
 dist_th = 70;
+TARG_DIR = 45;
 f_all = .5:.5:(Fs/2);
 pt_th = .325;
 max_signal_len = 500;
@@ -41,6 +42,7 @@ max_signal_len = 500;
 h_means_1 = cell(2, 3); %rows: L- vs. H-PT, cols: pred, unpred, or no-cue
 h_metric_trials = nan(length(data_set)*48, 6); %columns: metric, pred vs unpred, Low vs high pt, cue vs. no cue, trial, block, trial-needing-trajectory-flipped
 kin_metric_trials = nan(length(data_set)*48, max_signal_len, 5); %trials match with factors in h_metric_trials 
+v_metric_trials = nan(length(data_set)*48, 6);
             % (trials, signal-length, [time, y, vy, ay, |a|)
 for i_pt = 1:2
     for i_cue = 1:3
@@ -277,6 +279,27 @@ for i_block = 1:length(data_set)
                 end
                 kin_metric_trials(total_trial_k, 1:length(t_shifted_temp), 5) = b_data.ma(:, i_tr);
                 
+                % measure directional error of velocity from target:
+                ksplit_ = b_data.k_split(i_tr);
+                x__ = b_data.x(ksplit_:end, i_tr);
+                vx_ = b_data.vx(ksplit_:end, i_tr);
+                if flip_tr(i_tr)
+                    y__ = -b_data.y(ksplit_:end, i_tr);
+                    vy_ = -b_data.vy(ksplit_:end, i_tr);
+                else
+                    y__ = b_data.y(ksplit_:end, i_tr);
+                    vy_ = b_data.vy(ksplit_:end, i_tr);
+                end
+                d__ = sqrt(x__.^2 + y__.^2);
+                [~, k__th] = min(abs(d__ - dist_th));
+                v__dir = atan2d(vy_(k__th), vx_(k__th));
+                v_metric_trials(total_trial_k, 1) = v__dir - TARG_DIR;
+                v_metric_trials(total_trial_k, 2) = pred_tr(i_tr);
+                v_metric_trials(total_trial_k, 3) = hpt_tr(i_tr);
+                v_metric_trials(total_trial_k, 4) = nocue_tr(i_tr);
+                v_metric_trials(total_trial_k, 5) = total_trial_k;
+                v_metric_trials(total_trial_k, 6) = i_block;
+                
                 total_trial_k = total_trial_k + 1;
                 temp_h = nan(size(f_all));
                 t_shifted_temp = nan;
@@ -331,13 +354,18 @@ for i_block = 1:length(data_set)
 
 
         %% compute movement error:
-        v_mag = nan(1, size(b_data.x,2));
-        for i_tr = 1:size(b_data.x,2)
-            dist_sig = sqrt((b_data.x(:, i_tr)).^2 + (b_data.y(:, i_tr)).^2);
-            [~, k_min] = min((dist_sig - dist_th).^2);
-            v_mag(i_tr) = sqrt((b_data.vx(k_min, i_tr)).^2 + (b_data.vy(k_min, i_tr)).^2);
-        end
-        v_err(i_block) = nanmean(v_mag);
+%         v_mag = nan(1, size(b_data.x,2));
+%         for i_tr = 1:size(b_data.x,2)
+%             dist_sig = sqrt((b_data.x(:, i_tr)).^2 + (b_data.y(:, i_tr)).^2);
+%             [~, k_min] = min((dist_sig - dist_th).^2);
+% %             v_mag(i_tr) = sqrt((b_data.vx(k_min, i_tr)).^2 + (b_data.vy(k_min, i_tr)).^2);
+%             % get the direction of the velocity.
+%             
+%             % compute the error between direction of the velocity and
+%             % direction of target:
+%             
+%         end
+%         v_err(i_block) = nanmean(v_mag);
 
     catch er_
         warning('e');
@@ -347,9 +375,10 @@ end
 s_data.f = f_all;
 s_data.h_means_1 = h_means_1;
 s_data.h_means_2 = h_means_2;
-s_data.v_err = v_err;
+% s_data.v_err = v_err;
 s_data.h_all = h_metric_trials;
 s_data.kin_all = kin_metric_trials;
+s_data.v_err_all = v_metric_trials;
 
 function [f,h] = compute_psd(sd, F, valid_trs, which_half)
 % compute the first half of signal psd
@@ -364,7 +393,9 @@ trs_to_analyze = all_trs(valid_trs);
 
 for i_ = 1:length(trs_to_analyze)
     if ~isnan(sd.k_split(trs_to_analyze(i_)))
-        ss = sd.ma(~isnan(sd.ma(:, trs_to_analyze(i_))), trs_to_analyze(i_));
+        % select out the magnitude of acceleration:
+        ss_temp = sd.ma(:, trs_to_analyze(i_));
+        ss = ss_temp(~isnan(ss_temp));
         switch which_half
             case 1
                 % first half
@@ -382,3 +413,10 @@ for i_ = 1:length(trs_to_analyze)
         h(1:length(h_), i_) = h_;
     end
 end
+
+function dir_err = compute_velocity_error(sd, target)
+% compute the directional error: difference between direction of velocity
+% and target direction.
+
+
+
