@@ -133,11 +133,11 @@ end
 %% Plot kinematic measures:
 
 temp = H_results.kin_all;
-% metric_all has columns: 1) metric-value; 2) pred; 3) hpt; 4) nocue; 5) total_trial; 6) block
-hpt = H_results.metric_all(:, 3);
+% metric_all has columns: 1) metric-value; 2) pred; 4) hpt; 5) nocue; 6) total_trial; 7) block
+hpt = H_results.metric_all(:, 4);
 pred = H_results.metric_all(:, 2);
-nocue = H_results.metric_all(:, 4);
-block_ind = H_results.metric_all(:, 6);
+nocue = H_results.metric_all(:, 5);
+block_ind = H_results.metric_all(:, 7);
 
 hpt(isnan(hpt)) = 0;
 pred(isnan(pred)) = 0;
@@ -166,7 +166,7 @@ for i_block = 1:6
             if nargin > 1
                 plot_special(temp, sub_cat, basis_cat, varargin{1});
             else
-                plot_special(temp, sub_cat, basis_cat, varargin{1});
+                plot_special(temp, sub_cat, basis_cat, 'temp');
             end
 %             if sum(sub_cat > 0)
 %                 t_temp = temp(sub_cat, :,1);
@@ -231,7 +231,7 @@ for block_ind = 1:6
         if nargin > 1
             plot_special(temp, sub_cat, basis_cat, varargin{1});
         else
-            plot_special(temp, sub_cat, basis_cat, varargin{1});
+            plot_special(temp, sub_cat, basis_cat, 'temp');
         end
         
         title(['block:', num2str(i_block),...

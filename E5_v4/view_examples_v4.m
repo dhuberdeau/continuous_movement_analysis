@@ -1,4 +1,4 @@
-function varargout = view_examples_v3(data_set, varargin)
+function varargout = view_examples_v4(data_set, varargin)
 % view_examples
 %
 % optional inputs:
@@ -55,7 +55,8 @@ figure;
 for i_block = 1:length(data_set)
     try 
        % process block:
-        b_data = process_block_v3(data_set{i_block});
+%         b_data = process_block_v3(data_set{i_block});
+        b_data = process_block(data_set{i_block});
 
         % compute actual PT:
         pt = (1/Fs)*(b_data.k_split - b_data.k_targ);
@@ -140,7 +141,8 @@ varargout = {};
 i_block = 1;
 
 % process block:
-b_data = process_block_v3(data_set{i_block});
+% b_data = process_block_v3(data_set{i_block});
+b_data = process_block(data_set{i_block});
 
 % compute actual PT:
 pt = (1/Fs)*(b_data.k_split - b_data.k_targ);
@@ -190,7 +192,8 @@ plot(x_temp(:, lpt_tr & nocue_tr), y_temp(:, lpt_tr & nocue_tr), 'r');
 
 i_block = 4;
 % process block:
-b_data = process_block_v3(data_set{i_block});
+% b_data = process_block_v3(data_set{i_block});
+b_data = process_block(data_set{i_block});
 
 % compute actual PT:
 pt = (1/Fs)*(b_data.k_split - b_data.k_targ);

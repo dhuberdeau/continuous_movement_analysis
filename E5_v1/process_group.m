@@ -15,6 +15,7 @@ end
 N_f = size(b{1}.h_means_1{1,1},1);
 N_blocks = 5;
 N_trials_block = 48;
+N_FACTORS = 8;
 
 H_l_nc_2 = nan(N_f, length(data_sets));
 H_l_p_2 = nan(N_f, length(data_sets), N_blocks);
@@ -23,9 +24,10 @@ H_h_nc_2 = nan(N_f, length(data_sets));
 H_h_p_2 = nan(N_f, length(data_sets), N_blocks);
 H_h_np_2 = nan(N_f, length(data_sets), N_blocks);
 
-H_metric_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, 7);
-Kinematics_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, 500, 5);
-V_metric_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, 7);
+H_metric_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, N_FACTORS+1);
+Kinematics_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, 500, 8);
+V_metric_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, N_FACTORS+1);
+k_split_all = nan(length(data_sets)*(N_blocks+1)*N_trials_block, 1);
 k_all = 1;
 
 for i_sub = 1:length(data_sets)
@@ -51,13 +53,12 @@ for i_sub = 1:length(data_sets)
     end
     H_h_np_2(:, i_sub, end) = b{i_sub}.h_means_2{1,2}(:, end);
     
-    H_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 1:6) = b{i_sub}.h_all;
-    H_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 7) = i_sub;
-    
-    V_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 1:6) = b{i_sub}.v_err_all;
-    V_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 7) = i_sub;
-    
+    H_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 1:N_FACTORS) = b{i_sub}.h_all;
+    H_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), (N_FACTORS+1)) = i_sub;
+    V_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), 1:N_FACTORS) = b{i_sub}.v_err_all;
+    V_metric_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), (N_FACTORS+1)) = i_sub;
     Kinematics_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), :, :) = b{i_sub}.kin_all;
+    k_split_all(k_all - 1 + (1:size(b{i_sub}.h_all,1)), :, :) = b{i_sub}.k_split_all;
     
     k_all = k_all + size(b{i_sub}.h_all,1);
 end
@@ -72,6 +73,7 @@ H_results.freq = b{1}.f;
 H_results.metric_all = H_metric_all;
 H_results.kin_all = Kinematics_all;
 H_results.v_err_all = V_metric_all;
+H_results.k_split_all = k_split_all;
 
 %%
 H_temp = H_results.metric_all;

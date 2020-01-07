@@ -1,4 +1,4 @@
-function [t_main, y_out, v_out, a_out, ma_out, cat_out] = fit_transform_movement_direction(t, y, v, a, ma, cat)
+function [t_main, y_out, v_out, a_out, ma_out, cat_out] = fit_transform_movement_direction_learning(t, y, v, a, ma, cat)
 
 % function f = fit_transform_movement_direction(m)
 %

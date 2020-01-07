@@ -73,16 +73,16 @@ plot_timecourse <- function(dat_cue, dat_nocue){
 
 data_1 <- read.csv('H_metric_all_v1.txt', header = FALSE, na.strings = 'NaN')
 data_1 <- na.omit(data_1)
-nsub1 <- max(unique(data_1$V7)) #V7 is subject number.
+nsub1 <- max(unique(data_1$V8)) #V8 is subject number.
 
 data_2 <- read.csv('H_metric_all_v3.txt', header = FALSE, na.strings = 'NaN')
 data_2 <- na.omit(data_2)
-data_2$V7 <- data_2$V7 + nsub1
-nsub1_2 <- max(unique(data_2$V7))
+data_2$V8 <- data_2$V8 + nsub1
+nsub1_2 <- max(unique(data_2$V8))
 
 data_3 <- read.csv('H_metric_all_v4.txt', header = FALSE, na.strings = 'NaN')
 data_3 <- na.omit(data_3)
-data_3$V7 <- data_3$V7 + nsub1_2
+data_3$V8 <- data_3$V8 + nsub1_2
 
 data_comb <- rbind(data_1, rbind(data_2, data_3))
 
@@ -92,11 +92,12 @@ head(data_comb)
 dat_ <- data.frame(
   metric = data_comb$V1,
   predictive = as.factor(data_comb$V2),
-  hpt = as.factor(data_comb$V3),
-  nocue = as.factor(data_comb$V4),
-  trial = data_comb$V5,
-  block = data_comb$V6,
-  subject = data_comb$V7)
+  pt = as.numeric(data_comb$V3),
+  hpt = as.factor(data_comb$V4),
+  nocue = as.factor(data_comb$V5),
+  trial = data_comb$V6,
+  block = data_comb$V7,
+  subject = data_comb$V8)
 
 dat_ <- na.omit(dat_)
 dat0 <- subset(dat_, nocue == 1)
@@ -140,5 +141,13 @@ m2 <- lm(metric ~ predictive, data = dat)
 m3 <- lm(metric ~ hpt, data = dat)
 
 
-pwr.f2.test(u = 3, v = 80 - 3 - 1, f2 = .05/(1 - .05), sig.level = .05)
-pwr.f2.test(u = 3, f2 = .05/(1 - .05), sig.level = .05, power = 0.8)
+pwr.f2.test(u = 3, v = 80 - 3 - 1, f2 = .02/(1 - .02), sig.level = .05)
+pwr.f2.test(u = 3, f2 = .02/(1 - .02), sig.level = .05, power = 0.8)
+
+##      Multiple regression power calculation 
+## 
+##               u = 2 (degrees of freedom = number of independent variables)
+##               v = 49.88971 (degrees of freedom = n - u - 1)
+##              f2 = 0.4285714 (effect size (r^2/(1-r^2)))
+##       sig.level = 0.001 (usually .05)
+##           power = 0.8 (desired power)

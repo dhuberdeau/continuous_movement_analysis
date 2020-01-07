@@ -133,9 +133,9 @@ end
 %% Plot kinematic measures:
 
 temp = H_results.kin_all;
-hpt = H_results.metric_all(:, 3);
+hpt = H_results.metric_all(:, 4);
 pred = H_results.metric_all(:, 2);
-nocue = H_results.metric_all(:, 4);
+nocue = H_results.metric_all(:, 5);
 
 hpt(isnan(hpt)) = 0;
 pred(isnan(pred)) = 0;
